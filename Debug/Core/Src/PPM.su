@@ -1,0 +1,7 @@
+ppm.c:44:6:Set_Speed	16	static
+ppm.c:91:6:PPM	16	static
+ppm.c:107:6:Soft_Start	8	static
+ppm.c:118:13:delay_us	16	static
+ppm.c:131:17:Angule_to_Time	24	static
+ppm.c:146:13:Armonic_Reduction	8	static
+ppm.c:163:13:soft_switching	24	static
