@@ -12,28 +12,30 @@
 #include "tim.h"
 
 /* Private macro ------------------------------------------------------------*/
-#define SPEED_HIGH     10U
-#define SPEED_MEDIUM   90U
-#define SPEED_LOW     140U
+#define SPEED_HIGH      10U
+#define SPEED_MEDIUM    90U
+#define SPEED_LOW       140U
 
-#define PHASE_LOW     0x01U
-#define PHASE_MID     0x02U
-#define PHASE_HIGH    0x04U
+#define PHASE_LOW       0x01U
+#define PHASE_MID       0x02U
+#define PHASE_HIGH      0x04U
 
-#define SPEED_START   170U
+#define SPEED_START     170U
+
+#define TIME_DELAY_SOFT 10U
 
 /*------------------------------------------------------------*/
 
-uint8_t G_Angule_Value = 0x00U;
 volatile uint8_t G_phase_Value = PHASE_MID;
+uint8_t G_Angule_Value = 0x00U;
 Direction_increment_T gflag_increment;
 uint8_t lock_swticin = 0x00U;
 
 
 static void delay_us(uint32_t microseconds);
 static void soft_switching(uint8_t angule_start, uint8_t angule_end, Direction_increment_T direction);
-static uint16_t Angule_to_Time(uint8_t angule);
-static void Armonic_Reduction(void);
+static uint16_t angule_to_aime(uint8_t angule);
+static void armonic_reduction(void);
 
 /**
   * @brief  This function is intended to Generate the Pulse to be modulated
@@ -41,7 +43,7 @@ static void Armonic_Reduction(void);
   * @note   The angle value must be between 10 to 170 degrees
   * @retval None
   */
-void Set_Speed(void)
+void speed_set(void)
 {
 	static uint8_t lphase = PHASE_MID;
 	uint8_t langule = 0x00U;
@@ -69,7 +71,7 @@ void Set_Speed(void)
 
 		/* Updating local variable with current phase*/
 		lphase = G_phase_Value;
-		/* Updating Gobal variable with last angle value*/
+		/* Updating Global variable with last angle value*/
 		G_Angule_Value = langule;
 	}
 
@@ -77,7 +79,7 @@ void Set_Speed(void)
 	{
 		if(G_Angule_Value <= SPEED_LOW && G_Angule_Value >= SPEED_HIGH)
 		{
-			  Armonic_Reduction();
+			armonic_reduction();
 		}
 	}
 }
@@ -88,14 +90,13 @@ void Set_Speed(void)
   * @note   The angle value must be between 10 to 170 degrees
   * @retval None
   */
-void PPM(uint8_t angle)
+void ppm(uint8_t angle)
 {
 	HAL_GPIO_WritePin(TRIGGER_PIN_PORT, TRIGGER_PIN, GPIO_PIN_RESET);
-	delay_us(Angule_to_Time(angle));
+	delay_us(angule_to_aime(angle));
 	HAL_GPIO_WritePin(TRIGGER_PIN_PORT, TRIGGER_PIN, GPIO_PIN_SET);
-	delay_us(500);
+	delay_us(PULSE_WITH_TRIGGER);
 	HAL_GPIO_WritePin(TRIGGER_PIN_PORT, TRIGGER_PIN, GPIO_PIN_RESET);
-	delay_us(500);
 }
 
 /**
@@ -104,7 +105,7 @@ void PPM(uint8_t angle)
   * @note   The angle value must be between 10 to 170 degrees
   * @retval None
   */
-void Soft_Start(void)
+void soft_start(void)
 {
 	soft_switching(SPEED_START, SPEED_MEDIUM, decrement);
 }
@@ -117,7 +118,7 @@ void Soft_Start(void)
   */
 static void delay_us(uint32_t microseconds)
 {
-	__HAL_TIM_SET_COUNTER(&htim7, 0);
+	__HAL_TIM_SET_COUNTER(&htim7, 0x00U);
 
 	while( __HAL_TIM_GET_COUNTER(&htim7) < microseconds);
 }
@@ -128,9 +129,9 @@ static void delay_us(uint32_t microseconds)
   * @note   The angle value must be between 10 to 170 degrees
   * @retval time equivalence
   */
-static uint16_t Angule_to_Time(uint8_t angule)
+static uint16_t angule_to_aime(uint8_t angule)
 {
-	uint16_t ltime_result_convertion = 0;
+	uint16_t ltime_result_convertion = 0x00U;
 
 	ltime_result_convertion = ((9000U * angule) / (SPEED_START));
 
@@ -143,7 +144,7 @@ static uint16_t Angule_to_Time(uint8_t angule)
   * @param  None
   * @retval None
   */
-static void Armonic_Reduction(void)
+static void armonic_reduction(void)
 {
 	G_Angule_Value += 5;
 	HAL_Delay(8);
@@ -168,7 +169,7 @@ static void soft_switching(uint8_t angule_start, uint8_t angule_end, Direction_i
 		for(liter = angule_start; liter <= angule_end; liter++)
 		{
 			G_Angule_Value = liter;
-			HAL_Delay(8);
+			HAL_Delay(TIME_DELAY_SOFT);
 		}
 	}
 	else if(direction == decrement)
@@ -176,7 +177,7 @@ static void soft_switching(uint8_t angule_start, uint8_t angule_end, Direction_i
 		for(liter = angule_start; liter >= angule_end; liter--)
 		{
 			G_Angule_Value = liter;
-			HAL_Delay(8);
+			HAL_Delay(TIME_DELAY_SOFT);
 		}
 	}
 }

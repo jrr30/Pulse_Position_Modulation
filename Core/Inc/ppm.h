@@ -9,11 +9,12 @@
 #define INC_PPM_H_
 
 /* Exported macro ------------------------------------------------------------*/
-#define TRIGGER_PIN_PORT GPIOC
-#define TRIGGER_PIN      GPIO_PIN_8
-#define SYNC_PIN         GPIO_PIN_11
-#define INCREMENT_BUTTON GPIO_PIN_10
-#define DECREMENT_BUTTON GPIO_PIN_12
+#define TRIGGER_PIN_PORT   GPIOC
+#define TRIGGER_PIN        GPIO_PIN_8
+#define SYNC_PIN           GPIO_PIN_11
+#define INCREMENT_BUTTON   GPIO_PIN_10
+#define DECREMENT_BUTTON   GPIO_PIN_12
+#define PULSE_WITH_TRIGGER 800U
 
 /**
   * @brief  structure definition to set up counting up and down
@@ -31,21 +32,21 @@ typedef enum Direction_increment_t
   * @note   The angle value must be between 10 to 170 degrees
   * @retval None
   */
-void PPM(uint8_t angle);
+void ppm(uint8_t angle);
 
 /**
   * @brief  This API purpose is perform a soft start with an angle of 170 to 90 degrees
   * @param  None
   * @retval None
   */
-void Soft_Start(void);
+void soft_start(void);
 
 /**
   * @brief  This API sets the speed
   * @param  None
   * @retval None
   */
-void Set_Speed(void);
+void speed_set(void);
 
 #endif /* INC_PPM_H_ */
 

@@ -102,7 +102,7 @@ int main(void)
   HAL_TIM_Base_Start(&htim7);
   HAL_TIM_Base_Start_IT(&htim1);
   //HAL_TIM_Base_Start(&htim6);
-  Soft_Start();
+  soft_start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,7 +113,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  Set_Speed();
+	  speed_set();
   }
   /* USER CODE END 3 */
 }
@@ -168,7 +168,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim == &htim1)
 	{
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_11);
-		PPM(G_Angule_Value);
+		ppm(G_Angule_Value);
 
 	}
 }
